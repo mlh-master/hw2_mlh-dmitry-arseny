@@ -5,6 +5,8 @@ from pathlib import Path
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import cm
 import matplotlib.pyplot as plt
+from sklearn import preprocessing
+from sklearn.preprocessing import LabelEncoder
 from sklearn.linear_model import LinearRegression
 from sklearn.preprocessing import PolynomialFeatures
 from sklearn.preprocessing import StandardScaler
@@ -22,11 +24,23 @@ plt.rcParams['ytick.labelsize'] = 12
 
 random.seed(1)
 
-X = pd.read_csv("HW2_data.csv")
-# print(X.sample(8, random_state=5))
+col_names = ['Age', 'Gender', 'Increased Urination', 'Increased Thirst',
+       'Sudden Weight Loss', 'Weakness', 'Increased Hunger', 'Genital Thrush',
+       'Visual Blurring', 'Itching', 'Irritability', 'Delayed Healing',
+       'Partial Paresis', 'Muscle Stiffness', 'Hair Loss', 'Obesity',
+       'Diagnosis', 'Family History']
+X = pd.read_csv("HW2_data.csv", header=None, names= col_names).dropna()
+X=X.drop([0])
+
+categorical_feature_mask = X.dtypes==object
+categorical_cols = X.columns[categorical_feature_mask].tolist()
+le = LabelEncoder()
+X.loc[:, 'Gender':'Diagnosis'] = X.loc[:, 'Gender':'Diagnosis'].apply(lambda col: le.fit_transform(col))
+
 
 X_train, X_test = train_test_split(X, test_size = 0.20, random_state=1)
 logreg = LogisticRegression(solver='saga', multi_class='ovr', penalty='none', max_iter=10000)
 
-print(X_train)
+print(X)
+
 
